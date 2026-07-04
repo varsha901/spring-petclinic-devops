@@ -9,15 +9,15 @@ pipeline {
         AKS_CLUSTER = 'aks-petclinic'
     }
 
-    stages {
-        stage('Clone') {
-            steps {
-                git branch: 'main', url: 'https://github.com/spring-projects/spring-petclinic.git'
-            }
-        }
+       stage('Checkout') {
+         steps {
+               checkout scm
+          }
+      }
 
         stage('Build') {
             steps {
+                sh 'chmod +x mvnw'
                 sh './mvnw clean compile'
             }
         }
