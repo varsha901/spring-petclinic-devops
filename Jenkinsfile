@@ -9,11 +9,12 @@ pipeline {
         AKS_CLUSTER = 'aks-petclinic'
     }
 
-       stage('Checkout') {
-         steps {
-               checkout scm
-          }
-      }
+    stages {
+        stage('Clone') {
+            steps {
+                git branch: 'main', url: 'https://github.com/varsha901/spring-petclinic-devops.git'
+            }
+        }
 
         stage('Build') {
             steps {
@@ -77,9 +78,9 @@ pipeline {
                     sh '''
                     az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
                     az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER --overwrite-existing
-                    kubectl set image deployment/spring-petclinic spring-petclinic=$ACR_LOGIN_SERVER/$IMAGE_NAME:$BUILD_NUMBER || true
                     kubectl apply -f k8s/db.yml
                     kubectl apply -f k8s/petclinic.yml
+                    kubectl set image deployment/spring-petclinic spring-petclinic=$ACR_LOGIN_SERVER/$IMAGE_NAME:$BUILD_NUMBER || true
                     kubectl rollout status deployment/spring-petclinic
                     kubectl get pods
                     kubectl get svc
