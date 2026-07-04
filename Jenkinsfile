@@ -84,8 +84,8 @@ pipeline {
                     az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER --overwrite-existing
                     kubectl apply -f k8s/db.yml
                     kubectl apply -f k8s/petclinic.yml
-                    kubectl set image deployment/spring-petclinic spring-petclinic=$ACR_LOGIN_SERVER/$IMAGE_NAME:$BUILD_NUMBER || true
-                    kubectl rollout status deployment/spring-petclinic
+                    kubectl set image deployment/petclinic workload=$ACR_LOGIN_SERVER/$IMAGE_NAME:$BUILD_NUMBER
+                    kubectl rollout status deployment/petclinic
                     kubectl get pods
                     kubectl get svc
                     '''
