@@ -51,16 +51,20 @@ pipeline {
         }
 
         stage('Push to ACR') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'acr-creds', usernameVariable: 'ACR_USER', passwordVariable: 'ACR_PASS')]) {
-                    sh '''
-                    echo $ACR_PASS | docker login $ACR_LOGIN_SERVER -u $ACR_USER --password-stdin
-                    docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:$BUILD_NUMBER
-                    docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:latest
-                    '''
-                }
-            }
+    steps {
+        withCredentials([
+            usernamePassword(credentialsId: 'azure-sp', usernameVariable: 'AZURE_CLIENT_ID', passwordVariable: 'AZURE_CLIENT_SECRET'),
+            string(credentialsId: 'azure-tenant-id', variable: 'AZURE_TENANT_ID')
+        ]) {
+            sh '''
+            az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+            az acr login --name $ACR_NAME
+            docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:$BUILD_NUMBER
+            docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:latest
+            '''
         }
+    }
+}
 
         stage('Trivy Scan') {
             steps {
