@@ -3,12 +3,13 @@ kind: Service
 metadata:
   name: petclinic
 spec:
- type: LoadBalancer
-  ports:
-    - port: 80
-      targetPort: 8080
+  type: LoadBalancer
   selector:
     app: petclinic
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
 
 ---
 apiVersion: apps/v1
@@ -29,31 +30,40 @@ spec:
     spec:
       containers:
         - name: workload
-          image: varshapetclinicacr973.azurecr.io/spring-petclinic:9
+          image: varshapetclinicacr973.azurecr.io/spring-petclinic:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: postgres
+
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://demo-db:5432/petclinic
+
             - name: SPRING_DATASOURCE_USERNAME
               value: petclinic
+
             - name: SPRING_DATASOURCE_PASSWORD
               value: petclinic
+
             - name: SPRING_APPLICATION_JSON
               value: |
                 {
                   "management.endpoint.health.probes.add-additional-paths": true
                 }
-          ports:
-            - name: http
-              containerPort: 8080
-          livenessProbe:
-            httpGet:
-              path: /livez
-              port: http
-            initialDelaySeconds: 60
+
           readinessProbe:
             httpGet:
               path: /readyz
-              port: http
+              port: 8080
             initialDelaySeconds: 60
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
