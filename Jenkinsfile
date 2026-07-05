@@ -45,7 +45,7 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build --platform linux/amd64 -t $ACR_LOGIN_SERVER/$IMAGE_NAME:$BUILD_NUMBER .'
+                sh 'docker build --platform linux/arm64 -t $ACR_LOGIN_SERVER/$IMAGE_NAME:$BUILD_NUMBER .'
                 sh 'docker tag $ACR_LOGIN_SERVER/$IMAGE_NAME:$BUILD_NUMBER $ACR_LOGIN_SERVER/$IMAGE_NAME:latest'
             }
         }
