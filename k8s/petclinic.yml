@@ -31,11 +31,22 @@ spec:
       containers:
         - name: workload
           image: dsyer/petclinic
-          env:
+       env:
             - name: SPRING_PROFILES_ACTIVE
               value: postgres
+
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://demo-db:5432/petclinic
+
+            - name: SPRING_DATASOURCE_USERNAME
+              value: petclinic
+
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: petclinic
+
             - name: SERVICE_BINDING_ROOT
               value: /bindings
+
             - name: SPRING_APPLICATION_JSON
               value: |
                 {
